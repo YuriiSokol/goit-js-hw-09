@@ -23,3 +23,47 @@ function createPromise(position, delay) {
     }, delay);
   });
 }
+const countFinishedPrmomisesAndDisableBtn = i => {
+  if (i === promisesCounter - 1) {
+    createBtn.disabled = false;
+
+    return;
+  }
+  return (i = i + 1);
+};
+const onCreateBtnClick = event => {
+  event.preventDefault();
+  createBtn.disabled = true;
+  FinishedPromises = 0;
+  promisesCounter = 0;
+  const promisesTimeArray = createPromisesTimeArray(
+    firstDeleyInput.value,
+    deleyStepInput.value,
+    amountInput.value
+  );
+
+  for (let i = 0; i < promisesTimeArray.length; i++) {
+    createPromise(i + 1, promisesTimeArray[i])
+      .then(({ position, delay }) => {
+        Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+      })
+      .catch(({ position, delay }) => {
+        Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+      });
+  }
+};
+
+const createPromisesTimeArray = (firstDeley, deleyStep, amount) => {
+  const array = [];
+  for (let i = 0; i < amount; i++) {
+    if (i === 0) {
+      array[i] = parseInt(firstDeley);
+    } else {
+      array[i] = parseInt(deleyStep) * i + parseInt(firstDeley);
+    }
+  }
+  promisesCounter = array.length;
+  return array;
+};
+
+createBtn.addEventListener('click', onCreateBtnClick);
